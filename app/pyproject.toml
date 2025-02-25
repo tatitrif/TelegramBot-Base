@@ -1,0 +1,15 @@
+[tool.poetry]
+package-mode = false
+name = "app"
+version = "0.1.0"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+aiogram = "^3.18.0"
+pydantic-settings = "^2.8.0"
+loguru = "^0.7.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
