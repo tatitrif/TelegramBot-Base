@@ -20,6 +20,7 @@ class EnvSettings(BaseSettings):
 
 class TelegramConfig(EnvSettings, env_prefix="TELEGRAM_"):
     bot_token: SecretStr
+    default_lang: str = "ru"
 
 
 class DatabaseConfig(EnvSettings, env_prefix="DATABASE_"):

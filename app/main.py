@@ -9,7 +9,9 @@ from aiogram.exceptions import TelegramAPIError
 from aiogram.fsm.storage.memory import MemoryStorage
 
 from bot.handlers import common
+from bot.middlewares.db import DatabaseMiddleware
 from core.config import settings
+from storage.db import db_manager
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +21,6 @@ async def create_bot(token: str) -> Bot:
     session = AiohttpSession()
     default = DefaultBotProperties(parse_mode=ParseMode.HTML)
     bot = Bot(token=token, session=session, default=default)
-
     try:
         # Test bot token by getting bot info
         bot_info = await bot.get_me()
@@ -29,7 +30,7 @@ async def create_bot(token: str) -> Bot:
         await session.close()
         error_msg = f"Failed to initialize bot: {str(err)}"
         logger.error(error_msg)
-        raise ValueError(error_msg)
+        raise
 
 
 async def main():
@@ -38,10 +39,13 @@ async def main():
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     )
-    bot = None
+
+    bot = await create_bot(settings.telegram.bot_token.get_secret_value())
+    dp = Dispatcher(storage=MemoryStorage())
     try:
-        bot = await create_bot(settings.telegram.bot_token.get_secret_value())
-        dp = Dispatcher(storage=MemoryStorage())
+        db_manager.init(settings.database.uri)
+
+        dp.update.middleware.register(DatabaseMiddleware())
 
         dp.include_router(common.router)
 
@@ -54,8 +58,7 @@ async def main():
         logger.error(f"Startup error: {str(err)}")
         raise
     finally:
-        if bot is not None:
-            await bot.session.close()
+        await bot.session.close()
 
 
 if __name__ == "__main__":

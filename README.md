@@ -4,6 +4,10 @@
 
 ## Используемые технологии
 
+### Aiogram
+
+[Aiogram](https://docs.aiogram.dev/) — Python фреймворк для разработки телеграм-ботов.
+
 ### Alembic
 
 [Alembic](https://alembic.sqlalchemy.org/en/latest/) — это легкий инструмент миграции базы данных для использования совместно с SQLAlchemy.

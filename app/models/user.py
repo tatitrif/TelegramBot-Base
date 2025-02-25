@@ -1,4 +1,4 @@
-from sqlalchemy import String
+from sqlalchemy import String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import DeclarativeBaseModel, UpdatedAtColumn, CreatedAtColumn, IdColumn
@@ -6,5 +6,8 @@ from .base import DeclarativeBaseModel, UpdatedAtColumn, CreatedAtColumn, IdColu
 
 class User(DeclarativeBaseModel, IdColumn, UpdatedAtColumn, CreatedAtColumn):
     telegram_id: Mapped[int] = mapped_column(unique=True)
-    name: Mapped[str] = mapped_column()
-    language_code: Mapped[str] = mapped_column(String(length=2), nullable=True)
+    is_bot: Mapped[bool] = mapped_column(Boolean)
+    username: Mapped[str] = mapped_column()
+    first_name: Mapped[str] = mapped_column(nullable=True)
+    last_name: Mapped[str] = mapped_column(nullable=True)
+    language_code: Mapped[str] = mapped_column(String(length=3), nullable=True)
