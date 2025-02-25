@@ -22,8 +22,13 @@ class TelegramConfig(EnvSettings, env_prefix="TELEGRAM_"):
     bot_token: SecretStr
 
 
+class DatabaseConfig(EnvSettings, env_prefix="DATABASE_"):
+    uri: str
+
+
 class AppConfig(BaseModel):
     telegram: TelegramConfig
+    database: DatabaseConfig
 
 
 # noinspection PyArgumentList
@@ -31,6 +36,7 @@ class AppConfig(BaseModel):
 def create_app_config() -> AppConfig:
     return AppConfig(
         telegram=TelegramConfig(),
+        database=DatabaseConfig(),
     )
 
 
