@@ -1,5 +1,5 @@
 import asyncio
-from loguru import logger
+import logging
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
@@ -10,6 +10,8 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 from bot.handlers import common
 from core.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 async def create_bot(token: str) -> Bot:
@@ -31,6 +33,11 @@ async def create_bot(token: str) -> Bot:
 
 
 async def main():
+    # Configure logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+    )
     bot = None
     try:
         bot = await create_bot(settings.telegram.bot_token.get_secret_value())
