@@ -12,11 +12,11 @@
 
 [Alembic](https://alembic.sqlalchemy.org/en/latest/) — это легкий инструмент миграции базы данных для использования совместно с SQLAlchemy.
 
-`alembic init -t async <change> # это асинхронный код для создания миграций, добавьте путь для расположения директории миграции`
+`alembic init -t async <change>` # это асинхронный код для создания миграций, добавьте путь для расположения директории миграции
 
-`alembic revision --autogenerate -m "<change> # это сгенерит миграцию, добавьте название версии миграции`
+`alembic revision --autogenerate -m "<change>` # это сгенерит миграцию, добавьте название версии миграции
 
-`alembic upgrade head # это обновляет/настраивает базу данных с использованием самой последней версии)`
+`alembic upgrade head` # это обновляет/настраивает базу данных с использованием самой последней версии)
 
 ### Sqlalchemy
 
@@ -25,10 +25,6 @@
 ### Pydantic
 
 [Pydantic](https://docs.pydantic.dev/latest/) - библиотека Python для проверки данных и управления настройками.
-
-### Loguru
-
-[Loguru](https://loguru.readthedocs.io/en/stable/) — простая библиотека для ведения журналов.
 
 ### Poetry
 
