@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from aiogram import Router, F, types
@@ -31,8 +32,7 @@ async def start_cmd(message: Message, i18n: TranslatorRunner):
 async def subscribe_callback(callback: types.CallbackQuery):
     kbd = get_reply_keyboard(
         "Получить информацию по товару",
-        placeholder="Выберите действие",
-        sizes=(2,),
     )
-    await callback.message.answer("Subscribed", reply_markup=kbd)
-    await callback.message.delete()
+    await callback.message.edit_text("Subscribed")
+    await asyncio.sleep(0.5)
+    await callback.message.answer(text="Выберите действие:", reply_markup=kbd)
