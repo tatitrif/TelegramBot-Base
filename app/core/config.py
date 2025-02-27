@@ -20,6 +20,8 @@ class EnvSettings(BaseSettings):
 
 class TelegramConfig(EnvSettings, env_prefix="TELEGRAM_"):
     bot_token: SecretStr
+    throttle_time_spin: int = 2
+    throttle_time_other: int = 1
     default_lang: str = "ru"
 
 

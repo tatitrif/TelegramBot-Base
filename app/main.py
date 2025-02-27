@@ -10,6 +10,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 from bot.handlers import common
 from bot.middlewares.db import DatabaseMiddleware
+from bot.middlewares.throttling import ThrottlingMiddleware
 from core.config import settings
 from storage.db import db_manager
 
@@ -46,6 +47,13 @@ async def main():
         db_manager.init(settings.database.uri)
 
         dp.update.middleware.register(DatabaseMiddleware())
+        # Регистрация мидлвари для троттлинга
+        dp.message.middleware(
+            ThrottlingMiddleware(
+                settings.telegram.throttle_time_spin,
+                settings.telegram.throttle_time_other,
+            )
+        )
 
         dp.include_router(common.router)
 
