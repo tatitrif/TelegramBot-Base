@@ -6,7 +6,6 @@ from aiogram.types import Message
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot.keyboards.builders import get_inline_keyboard, get_reply_keyboard
-from services.user import UserService
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +16,7 @@ router = Router(name="common")
 async def start_cmd(message: Message, session: AsyncSession):
     """Start command handler."""
     user_data = message.from_user
-    await UserService(session).add_one(user_data)
+
     await message.answer(
         text="Subscribe text",
         reply_markup=get_inline_keyboard(
