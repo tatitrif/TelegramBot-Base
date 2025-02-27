@@ -11,8 +11,10 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from bot.handlers import common
 from bot.middlewares.db import DatabaseMiddleware
 from bot.middlewares.throttling import ThrottlingMiddleware
+from bot.middlewares.translator import TranslatorRunnerMiddleware
 from bot.middlewares.user import UserMiddleware
 from core.config import settings
+from i18n.translator import translator_hub
 from storage.db import db_manager
 
 logger = logging.getLogger(__name__)
@@ -57,12 +59,20 @@ async def main():
         dp.update.middleware.register(DatabaseMiddleware())
         dp.message.outer_middleware(UserMiddleware())
 
+        t = TranslatorRunnerMiddleware()
+        dp.message.middleware(t)
+        dp.callback_query.middleware(t)
+
         dp.include_router(common.router)
 
         logger.info("Remove webhook integration")
         await bot.delete_webhook(drop_pending_updates=True)
         logger.info("Start polling")
-        await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
+        await dp.start_polling(
+            bot,
+            allowed_updates=dp.resolve_used_update_types(),
+            _translator_hub=translator_hub,
+        )
 
     except Exception as err:
         logger.error(f"Startup error: {str(err)}")

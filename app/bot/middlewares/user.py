@@ -24,10 +24,9 @@ class UserMiddleware(BaseMiddleware):
         data: dict[str, Any],
     ) -> Any:
         event = cast(Message, event)
-        user = event.from_user
-
-        if user.id not in self.cache:
+        from_user = getattr(event, "from_user", None)
+        if from_user.id not in self.cache:
             session: AsyncSession = data["session"]
-            await UserService(session).add_one(user)
-            self.cache[user.id] = None
+            await UserService(session).add_one(from_user)
+            self.cache[from_user.id] = None
         return await handler(event, data)
