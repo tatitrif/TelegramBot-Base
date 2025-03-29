@@ -87,7 +87,7 @@ async def main():
     # Configure logging
     logging.basicConfig(
         level=logging.INFO,
-        format="%(filename)s:%(lineno)d - [%(asctime)s] - %(levelname)s - %(name)s - %(message)s",
+        format="[%(asctime)s] - %(levelname)s - %(filename)s:%(lineno)d - %(name)s - %(message)s",
     )
 
     bot = await create_bot(settings.telegram.bot_token.get_secret_value())
