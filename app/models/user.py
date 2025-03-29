@@ -5,7 +5,6 @@ from .base import DeclarativeBaseModel, UpdatedAtColumn, CreatedAtColumn, IdColu
 
 
 class User(DeclarativeBaseModel, IdColumn, UpdatedAtColumn, CreatedAtColumn):
-    telegram_id: Mapped[int] = mapped_column(unique=True)
     is_bot: Mapped[bool] = mapped_column(Boolean)
     username: Mapped[str] = mapped_column()
     first_name: Mapped[str] = mapped_column(nullable=True)

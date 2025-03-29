@@ -1,3 +1,4 @@
+import logging
 from collections.abc import Callable, Awaitable
 from typing import Any, cast
 
@@ -6,7 +7,10 @@ from aiogram.types import TelegramObject, Message
 from cachetools import TTLCache
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from services.chat import ChatService
 from services.user import UserService
+
+logger = logging.getLogger(__name__)
 
 
 class UserMiddleware(BaseMiddleware):
@@ -25,8 +29,14 @@ class UserMiddleware(BaseMiddleware):
     ) -> Any:
         event = cast(Message, event)
         from_user = getattr(event, "from_user", None)
+        msg_text = getattr(event, "text", None)
+        session: AsyncSession = data["session"]
+
         if from_user.id not in self.cache:
-            session: AsyncSession = data["session"]
             await UserService(session).add_one(from_user)
             self.cache[from_user.id] = None
+
+        if msg_text:
+            await ChatService(session).add_one(from_user.id, msg_text)
+
         return await handler(event, data)

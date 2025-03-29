@@ -14,13 +14,11 @@ class UserService:
         self.session = session
 
     async def add_one(self, user_data):
-        user_info = await UserRepository(self.session).find_one_or_none(
-            telegram_id=user_data.id
-        )
+        user_info = await UserRepository(self.session).find_one_or_none(id=user_data.id)
         if not user_info:
             try:
                 user_schema = UserSchema(
-                    telegram_id=user_data.id,
+                    id=user_data.id,
                     is_bot=user_data.is_bot,
                     username=user_data.username,
                     first_name=user_data.first_name,
