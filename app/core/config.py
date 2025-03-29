@@ -23,6 +23,7 @@ class TelegramConfig(EnvSettings, env_prefix="TELEGRAM_"):
     throttle_time_spin: int = 2
     throttle_time_other: int = 1
     lang_default: str = "ru"
+    drop_pending_updates: bool = False
 
 
 class DatabaseConfig(EnvSettings, env_prefix="DATABASE_"):

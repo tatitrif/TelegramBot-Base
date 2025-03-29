@@ -37,11 +37,26 @@ async def create_bot(token: str) -> Bot:
         raise
 
 
+async def run_polling(dispatcher, bot: Bot) -> None:
+    logger.info("Remove webhook integration")
+    await bot.delete_webhook(
+        drop_pending_updates=settings.telegram.drop_pending_updates
+    )
+    logger.info("Start polling")
+    await dispatcher.start_polling(
+        bot,
+        allowed_updates=dispatcher.resolve_used_update_types(),
+        _translator_hub=translator_hub,
+    )
+    if settings.telegram.drop_pending_updates:
+        logger.info("Drop all pending updates")
+
+
 async def main():
     # Configure logging
     logging.basicConfig(
         level=logging.INFO,
-        format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+        format="%(filename)s:%(lineno)d - [%(asctime)s] - %(levelname)s - %(name)s - %(message)s",
     )
 
     bot = await create_bot(settings.telegram.bot_token.get_secret_value())
@@ -65,15 +80,7 @@ async def main():
 
         dp.include_router(common.router)
 
-        logger.info("Remove webhook integration")
-        await bot.delete_webhook(drop_pending_updates=True)
-        logger.info("Start polling")
-        await dp.start_polling(
-            bot,
-            allowed_updates=dp.resolve_used_update_types(),
-            _translator_hub=translator_hub,
-        )
-
+        await run_polling(dispatcher=dp, bot=bot)
     except Exception as err:
         logger.error(f"Startup error: {str(err)}")
         raise
