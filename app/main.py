@@ -38,18 +38,49 @@ async def create_bot(token: str) -> Bot:
 
 
 async def run_polling(dispatcher, bot: Bot) -> None:
-    logger.info("Remove webhook integration")
-    await bot.delete_webhook(
-        drop_pending_updates=settings.telegram.drop_pending_updates
-    )
-    logger.info("Start polling")
+    logger.info("run polling")
     await dispatcher.start_polling(
         bot,
         allowed_updates=dispatcher.resolve_used_update_types(),
         _translator_hub=translator_hub,
     )
+
+
+def setup_handlers(dp: Dispatcher) -> None:
+    dp.include_router(common.router)
+
+
+def setup_middlewares(dp: Dispatcher) -> None:
+    dp.message.middleware(
+        ThrottlingMiddleware(
+            settings.telegram.throttle_time_spin,
+            settings.telegram.throttle_time_other,
+        )
+    )
+
+    dp.update.middleware.register(DatabaseMiddleware())
+    dp.message.outer_middleware(UserMiddleware())
+
+    t = TranslatorRunnerMiddleware()
+    dp.message.middleware(t)
+    dp.callback_query.middleware(t)
+
+
+async def on_startup(dispatcher: Dispatcher, bot: Bot):
+    logging.info("startup bot...")
+    db_manager.init(settings.database.uri)
+    setup_middlewares(dispatcher)
+    setup_handlers(dispatcher)
+    logger.info("Remove webhook integration")
+    await bot.delete_webhook(
+        drop_pending_updates=settings.telegram.drop_pending_updates
+    )
     if settings.telegram.drop_pending_updates:
         logger.info("Drop all pending updates")
+
+
+async def on_shutdown(dispatcher: Dispatcher, bot: Bot):
+    logging.info("shutdown bot...")
 
 
 async def main():
@@ -62,23 +93,8 @@ async def main():
     bot = await create_bot(settings.telegram.bot_token.get_secret_value())
     dp = Dispatcher(storage=MemoryStorage())
     try:
-        db_manager.init(settings.database.uri)
-
-        dp.message.middleware(
-            ThrottlingMiddleware(
-                settings.telegram.throttle_time_spin,
-                settings.telegram.throttle_time_other,
-            )
-        )
-
-        dp.update.middleware.register(DatabaseMiddleware())
-        dp.message.outer_middleware(UserMiddleware())
-
-        t = TranslatorRunnerMiddleware()
-        dp.message.middleware(t)
-        dp.callback_query.middleware(t)
-
-        dp.include_router(common.router)
+        dp.startup.register(on_startup)
+        dp.shutdown.register(on_shutdown)
 
         await run_polling(dispatcher=dp, bot=bot)
     except Exception as err:
