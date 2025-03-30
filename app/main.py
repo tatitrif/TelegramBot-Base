@@ -14,6 +14,7 @@ from bot.middlewares.throttling import ThrottlingMiddleware
 from bot.middlewares.translator import TranslatorRunnerMiddleware
 from bot.middlewares.user import UserMiddleware
 from core.config import settings
+from core.logger_setup import safely_start_logger
 from i18n.translator import translator_hub
 from storage.db import db_manager
 
@@ -84,12 +85,8 @@ async def on_shutdown(dispatcher: Dispatcher, bot: Bot):
 
 
 async def main():
-    # Configure logging
-    logging.basicConfig(
-        level=logging.INFO,
-        format="[%(asctime)s] - %(levelname)s - %(filename)s:%(lineno)d - %(name)s - %(message)s",
-    )
-
+    # initialize the logger
+    await safely_start_logger()
     bot = await create_bot(settings.telegram.bot_token.get_secret_value())
     dp = Dispatcher(storage=MemoryStorage())
     try:
